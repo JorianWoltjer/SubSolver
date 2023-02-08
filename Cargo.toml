@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+clap = "4.1.4"
+colored = "2.0.0"
 lazy_static = "1.4.0"
