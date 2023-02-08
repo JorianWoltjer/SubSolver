@@ -14,7 +14,9 @@ fn intersect(a: HashSet<char>, b: HashSet<char>) -> HashSet<char> {
     result
 }
 
+/// Remove certain words from the candidates that are not possible
 pub fn prune(cipher_words: &mut Vec<Word>) {
+    // Initialize with all possible letters
     let mut pruner: HashMap<char, HashSet<char>> = HashMap::new();
     for i in 'a'..='z' {
         for j in 'a'..='z' {
@@ -23,6 +25,7 @@ pub fn prune(cipher_words: &mut Vec<Word>) {
         }
     }
 
+    // Remove letters that are not possible
     for word in cipher_words.iter() {
         for j in word.word.chars() {
             pruner.entry(j)
@@ -30,6 +33,7 @@ pub fn prune(cipher_words: &mut Vec<Word>) {
         }
     }
     
+    // Remove candidates that are not possible
     for word in cipher_words.iter_mut() {
         for j in 0..word.word.len() {
             word.candidates.retain(|k| pruner.get(&word.word.chars().nth(j).unwrap()).unwrap().contains(&k.chars().nth(j).unwrap()));
@@ -37,6 +41,14 @@ pub fn prune(cipher_words: &mut Vec<Word>) {
     }
 }
 
+pub fn order_by_possible_words(cipher_words: &mut Vec<Word>) {
+    cipher_words.sort_by(|a, b| {
+        let a = a.word.len();
+        let b = b.word.len();
+
+        b.cmp(&a)
+    });
+}
 
 fn is_consistent(map: &HashMap<char, char>) -> bool {
     let mut counter: HashMap<char, char> = HashMap::new();
@@ -80,16 +92,17 @@ impl Solver {
         }
     }
 
-    pub fn solve(&mut self) {
+    pub fn solve(&mut self, original_cipher_words: &Vec<Word>) {
         let mut map: HashMap<char, char> = HashMap::new();
-        self.solve_recursive(0, &mut map);
+        self.solve_recursive(0, &mut map, original_cipher_words);
     }
 
-    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>) {
+    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, original_cipher_words: &Vec<Word>) {
         if is_consistent(map) {
-            if depth >= self.cipher_words.len() {  // FOUND SOLUTION
-                for word in &self.cipher_words {
-                    for j in word.word.chars() {
+            if depth >= self.cipher_words.len() {
+                // Print solution
+                for word in original_cipher_words {
+                    for j in word.word.chars() {  // Substitute letters
                         print!("{}", map.get(&j).unwrap());
                     }
     
@@ -99,11 +112,12 @@ impl Solver {
                 println!("");
             }
             else {
+                // Explore all candidates
                 for i in self.cipher_words[depth].candidates.to_owned().iter() {
-                    // println!("{}{} -> {}", "  ".repeat(depth), self.cipher_words[depth].word, i);
                     if &apply_map(&self.cipher_words[depth].word, &i, map) == i {
                         self.solve_recursive(depth + 1, 
-                            &mut update_map(&self.cipher_words[depth].word, &i, map));
+                            &mut update_map(&self.cipher_words[depth].word, &i, map), 
+                            original_cipher_words);
                     }
                 }
             }

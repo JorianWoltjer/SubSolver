@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = "4.1.4"
+clap = { version = "4.1.4", features = ["derive"] }
 colored = "2.0.0"
-lazy_static = "1.4.0"
+unidecode = "0.3.0"
