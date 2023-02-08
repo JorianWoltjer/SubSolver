@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}};
+use std::{collections::{HashMap, HashSet}, sync::mpsc};
 
 use crate::Word;
 
@@ -92,24 +92,15 @@ impl Solver {
         }
     }
 
-    pub fn solve(&mut self, original_cipher_words: &Vec<Word>) {
+    pub fn solve(&mut self, tx: &mpsc::Sender<HashMap<char, char>>) {
         let mut map: HashMap<char, char> = HashMap::new();
-        self.solve_recursive(0, &mut map, original_cipher_words);
+        self.solve_recursive(0, &mut map, &tx);
     }
 
-    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, original_cipher_words: &Vec<Word>) {
+    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, tx: &mpsc::Sender<HashMap<char, char>>) {
         if is_consistent(map) {
-            if depth >= self.cipher_words.len() {
-                // Print solution
-                for word in original_cipher_words {
-                    for j in word.word.chars() {  // Substitute letters
-                        print!("{}", map.get(&j).unwrap());
-                    }
-    
-                    print!(" ");
-                }
-    
-                println!("");
+            if depth >= self.cipher_words.len() {  // Solution found
+                tx.send(map.to_owned()).unwrap();
             }
             else {
                 // Explore all candidates
@@ -117,7 +108,7 @@ impl Solver {
                     if &apply_map(&self.cipher_words[depth].word, &i, map) == i {
                         self.solve_recursive(depth + 1, 
                             &mut update_map(&self.cipher_words[depth].word, &i, map), 
-                            original_cipher_words);
+                            tx);
                     }
                 }
             }

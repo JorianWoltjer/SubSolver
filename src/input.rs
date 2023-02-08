@@ -20,18 +20,18 @@ pub fn clean_input(input: &str) -> String {
 
 /// Parse the input string into a vector of `Word`s. 
 /// Returns `None` if the input string contains a word that is not possible in the dictionary
-pub fn input_to_words(input: &str, dictionary: HashMap<String, HashSet<String>>) -> Option<Vec<Word>> {
+pub fn input_to_words(input: &str, dictionary: HashMap<String, HashSet<String>>) -> Result<Vec<Word>, String> {
     let mut result = Vec::new();
 
     for word in input.split_whitespace() {
         if let Some(candidates) = dictionary.get(&normalize(word)) {
             result.push(Word::new(word, candidates));
         } else {
-            return None;
+            return Err(format!("Word {:?} is not possible in the dictionary", word));
         }
     }
 
-    Some(result)
+    Ok(result)
 }
 
 #[cfg(test)]

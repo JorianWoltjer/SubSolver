@@ -5,6 +5,7 @@ use input::clean_input;
 pub mod input;
 pub mod solve;
 pub mod cli;
+pub mod loading;
 
 #[derive(Debug, Clone)]
 pub struct Word {
@@ -69,4 +70,14 @@ pub fn load_wordlist(contents: String) -> HashMap<String, HashSet<String>> {
     }
 
     map
+}
+
+pub fn apply_solution(cipher: &str, solution: &HashMap<char, char>) -> String {
+    let mut result = String::new();
+
+    for c in cipher.chars() {
+        result.push(*solution.get(&c).unwrap_or(&c));
+    }
+
+    result
 }
