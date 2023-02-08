@@ -72,10 +72,10 @@ pub fn load_wordlist(contents: String) -> HashMap<String, HashSet<String>> {
     map
 }
 
-pub fn apply_solution(cipher: &str, solution: &HashMap<char, char>) -> String {
+pub fn apply_solution(ciphertext: &str, solution: &HashMap<char, char>) -> String {
     let mut result = String::new();
 
-    for c in cipher.chars() {
+    for c in ciphertext.chars() {
         result.push(*solution.get(&c).unwrap_or(&c));
     }
 

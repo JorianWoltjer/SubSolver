@@ -92,9 +92,8 @@ impl Solver {
         }
     }
 
-    pub fn solve(&mut self, tx: &mpsc::Sender<HashMap<char, char>>) {
-        let mut map: HashMap<char, char> = HashMap::new();
-        self.solve_recursive(0, &mut map, &tx);
+    pub fn solve(&mut self, tx: &mpsc::Sender<HashMap<char, char>>, mut starting_key: HashMap<char, char>) {
+        self.solve_recursive(0, &mut starting_key, &tx);
     }
 
     fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, tx: &mpsc::Sender<HashMap<char, char>>) {
@@ -113,5 +112,30 @@ impl Solver {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{input::input_to_words, load_wordlist, apply_solution};
+
+    use super::*;
+
+    #[test]
+    fn can_solve() {
+        let ciphertext = "x cbt tloap";
+        let wordlist = ["many", "words", "here", "to", "test", "the", "solver", "also", "few", "a", "ok", "now", "all", "words", "should", "be", "good"]
+                                    .join("\n");
+        let dictionary = load_wordlist(wordlist);
+
+        let cipher_words = input_to_words(ciphertext, dictionary).unwrap();
+        let mut solver = Solver::new(cipher_words);
+        
+        let (tx, rx) = mpsc::channel();
+        solver.solve(&tx, HashMap::new());
+        
+        let solution = rx.recv().unwrap();
+        let plaintext = apply_solution(ciphertext, &solution);
+        assert_eq!(plaintext, "a few words");
     }
 }

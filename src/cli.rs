@@ -12,6 +12,10 @@ pub struct Args {
     /// Path to the wordlist file (default: built-in english.txt)
     #[arg(short, long)]
     pub wordlist: Option<String>,
+
+    /// Starting key, letter mapping (default: empty, example: "a:b,c:d,e:f", "ab,cd,ef", "b?d?f?????????????????????")
+    #[arg(short, long)]
+    pub key: Option<String>,
 }
 
 #[derive(Parser, Debug)]

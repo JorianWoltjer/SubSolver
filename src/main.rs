@@ -1,9 +1,9 @@
-use std::{error::Error, fs::read_to_string, thread, sync::mpsc};
+use std::{error::Error, fs::read_to_string, thread, sync::mpsc, collections::HashMap};
 
 use clap::Parser;
 use anyhow::Result;
 
-use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input}, cli::Args, load_wordlist, apply_solution, loading::Loading};
+use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, apply_solution, loading::Loading};
 
 fn main() {
     let loading = Loading::default();
@@ -18,6 +18,17 @@ fn main() {
 fn do_main(loading: &Loading) -> Result<(), Box<dyn Error>> {
     // Parse args
     let args = Args::parse();
+
+    let starting_key = match args.key {
+        Some(key) => {
+            loading.info(format!("Using starting key: {:?}", key));
+            parse_key(&key)?
+        },
+        None => {
+            loading.info(format!("Using empty starting key"));
+            HashMap::new()
+        }
+    };
 
     loading.text("Loading wordlist...".to_string());
 
@@ -70,9 +81,8 @@ fn do_main(loading: &Loading) -> Result<(), Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
-        // TODO: allow partial key as argument in here
         let mut solver = Solver::new(cipher_words);
-        solver.solve(&tx);
+        solver.solve(&tx, starting_key);
     });
     
     let mut solutions = 0;
