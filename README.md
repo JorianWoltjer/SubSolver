@@ -16,6 +16,8 @@ The implementation of the algorithm is taken from [this repository](https://gith
 cargo install sub-solver
 ```
 
+Or **download** and **extract** a pre-compiled binary from the [Releases](https://github.com/JorianWoltjer/SubSolver/releases) page. 
+
 ## Usage
 
 ```Shell
