@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}, sync::mpsc};
+use std::{collections::{HashMap, HashSet}, sync::mpsc, fmt::Display};
 
 use crate::Word;
 
@@ -92,14 +92,15 @@ impl Solver {
         }
     }
 
-    pub fn solve(&mut self, tx: &mpsc::Sender<HashMap<char, char>>, mut starting_key: HashMap<char, char>) {
+    pub fn solve(&mut self, tx: &mpsc::Sender<Solution>, mut starting_key: HashMap<char, char>) {
         self.solve_recursive(0, &mut starting_key, &tx);
     }
 
-    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, tx: &mpsc::Sender<HashMap<char, char>>) {
+    fn solve_recursive(&mut self, depth: usize, map: &mut HashMap<char, char>, tx: &mpsc::Sender<Solution>) {
         if is_consistent(map) {
             if depth >= self.cipher_words.len() {  // Solution found
-                tx.send(map.to_owned()).unwrap();
+                let solution = Solution::new(map.to_owned());
+                tx.send(solution).unwrap();
             }
             else {
                 // Explore all candidates
@@ -115,9 +116,56 @@ impl Solver {
     }
 }
 
+pub struct Solution {
+    pub key: HashMap<char, char>,
+}
+impl Solution {
+    pub fn new(key: HashMap<char, char>) -> Self {
+        Solution {
+            key,
+        }
+    }
+    
+    /// Fill unknowns in the key with unused letters
+    pub fn fill_key(&mut self) {
+        let mut unused: Vec<char> = ('a'..='z').rev().collect();
+        // Filter used letters
+        for value in self.key.values() {
+            unused.retain(|x| x != value);
+        }
+
+        // Fill unknown letters with unused letters
+        for c in 'a'..='z' {
+            if !self.key.contains_key(&c) {
+                self.key.insert(c, unused.pop().unwrap());
+            }
+        }
+    }
+
+    pub fn apply(&self, ciphertext: &str) -> String {
+        let mut result = String::new();
+        
+        for c in ciphertext.chars() {
+            // Show unknown letters as '?', but keep punctuation
+            result.push(*self.key.get(&c).unwrap_or_else(|| {
+                if c.is_alphabetic() { &'?' } else { &c }
+            }));
+        }
+
+        result
+    }
+}
+impl Display for Solution {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        ('a'..='z')
+            .map(|c| *self.key.get(&c).unwrap_or(&'?'))
+            .collect::<String>().fmt(f)
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::{input::input_to_words, load_wordlist, apply_solution};
+    use crate::{input::input_to_words, load_wordlist};
 
     use super::*;
 
@@ -135,7 +183,7 @@ mod tests {
         solver.solve(&tx, HashMap::new());
         
         let solution = rx.recv().unwrap();
-        let plaintext = apply_solution(ciphertext, &solution);
+        let plaintext = solution.apply(ciphertext);
         assert_eq!(plaintext, "a few words");
     }
 }

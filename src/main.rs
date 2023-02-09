@@ -3,22 +3,22 @@ use std::{error::Error, fs::read_to_string, thread, sync::mpsc, collections::Has
 use clap::Parser;
 use anyhow::Result;
 
-use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, apply_solution, loading::Loading};
+use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, loading::Loading};
 
 fn main() {
+    let args = Args::parse();
+
     let loading = Loading::default();
     
-    if let Err(e) = do_main(&loading) {
+    if let Err(e) = do_main(&loading, args) {
         loading.fail(e.to_string());
         loading.end();
         std::process::exit(1);
     }
 }
 
-fn do_main(loading: &Loading) -> Result<(), Box<dyn Error>> {
+fn do_main(loading: &Loading, args: Args) -> Result<(), Box<dyn Error>> {
     // Parse args
-    let args = Args::parse();
-
     let starting_key = match args.key {
         Some(key) => {
             loading.info(format!("Using starting key: {:?}", key));
@@ -62,9 +62,9 @@ fn do_main(loading: &Loading) -> Result<(), Box<dyn Error>> {
     };
 
     // Parse input
-    let clean = clean_input(&ciphertext);
+    let ciphertext_clean = clean_input(&ciphertext);
     
-    let mut cipher_words = input_to_words(&clean, dictionary.clone())?;
+    let mut cipher_words = input_to_words(&ciphertext_clean, dictionary.clone())?;
 
     loading.success(format!("Parsed {} input words", cipher_words.len()));
     
@@ -86,12 +86,14 @@ fn do_main(loading: &Loading) -> Result<(), Box<dyn Error>> {
     });
     
     let mut solutions = 0;
-    for solution in rx {  // Print solutions as they are found
-        let plaintext = apply_solution(&clean, &solution);
-        let key = "abcdefghijklmnopqrstuvwxyz".chars()
-            .map(|c| *solution.get(&c).unwrap_or(&c))
-            .collect::<String>();
-        println!("{} -> {}", key, plaintext);
+    for mut solution in rx {  // Print solutions as they are found
+        let plaintext = solution.apply(&ciphertext_clean);
+
+        if args.fill_key {
+            solution.fill_key();
+        }
+
+        println!("{} -> {}", solution, plaintext);
         solutions += 1;
     }
 

@@ -16,6 +16,10 @@ pub struct Args {
     /// Starting key, letter mapping (default: empty, example: "a:b,c:d,e:f", "ab,cd,ef", "b?d?f?????????????????????")
     #[arg(short, long)]
     pub key: Option<String>,
+
+    /// Fill in unknowns in solution with random unused letters (default: false)
+    #[arg(short='F', long)]
+    pub fill_key: bool,
 }
 
 #[derive(Parser, Debug)]
