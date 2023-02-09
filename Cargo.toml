@@ -8,7 +8,7 @@ description = "Solve Substitution Ciphers using a wordlist"
 readme = "README.md"
 homepage = "https://github.com/JorianWoltjer/SubSolver"
 repository = "https://github.com/JorianWoltjer/SubSolver"
-keywords = ["cli", "cryptography", "cipher", "solver", "substitution", "wordlist"]
+keywords = ["cli", "crypto", "security", "solver", "wordlist"]
 categories = ["command-line-utilities"]
 
 [dependencies]
