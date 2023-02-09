@@ -1,15 +1,18 @@
 name: Release
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
-      - v[0-9]+.*
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: taiki-e/create-gh-release-action@v1
         #with:
           # (optional)
@@ -27,7 +30,7 @@ jobs:
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
