@@ -2,7 +2,7 @@ on:
   release:
     types: [created]
 
-name: Release Builds
+name: Release
 
 jobs:
   release:
