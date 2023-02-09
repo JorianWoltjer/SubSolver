@@ -20,6 +20,10 @@ pub struct Args {
     /// Fill in unknowns in solution with random unused letters (default: false)
     #[arg(short='F', long)]
     pub fill_key: bool,
+
+    /// Disable dictionary cache (default: false)
+    #[arg(short, long)]
+    pub no_cache: bool,
 }
 
 #[derive(Parser, Debug)]

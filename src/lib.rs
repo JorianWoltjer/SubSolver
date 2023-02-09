@@ -1,3 +1,5 @@
+#[macro_use] extern crate lazy_static;
+
 use std::{collections::{HashMap, HashSet}};
 
 use input::clean_input;
@@ -6,6 +8,7 @@ pub mod input;
 pub mod solve;
 pub mod cli;
 pub mod loading;
+pub mod cache;
 
 #[derive(Debug, Clone)]
 pub struct Word {
@@ -60,7 +63,7 @@ pub fn normalize(s: &str) -> String {
 }
 
 /// Load a wordlist from a file into a dictionary with normalized words
-pub fn load_wordlist(contents: String) -> HashMap<String, HashSet<String>> {
+pub fn load_wordlist(contents: &str) -> HashMap<String, HashSet<String>> {
     let mut map = HashMap::new();
 
     for word in contents.lines() {

@@ -152,15 +152,6 @@ impl Default for Spinner {
 }
 
 impl Spinner {
-    /// Create a Spinner
-    ///
-    /// ```
-    /// let spin = Spinner::new(vec!["∙∙∙", "●∙∙", "∙●∙", "∙∙●"])
-    /// ```
-    ///
-    /// ```
-    /// let spin = Spinner::new(vec!["+", "-", "*", "/"])
-    /// ```
     pub fn new(frames: Vec<&'static str>) -> Self {
         Self {
             index: 0,

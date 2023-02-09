@@ -14,8 +14,9 @@ const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz";
 /// - Normalize unicode characters
 pub fn clean_input(input: &str) -> String {
     unidecode(input).chars()
-        .filter(|c| c.is_ascii_alphabetic() || c == &' ')
-        .map(|c| c.to_ascii_lowercase())
+        .map(|c| if c.is_ascii_alphabetic() { c.to_ascii_lowercase() } else { ' ' })
+        // .filter(|c| c.is_ascii_alphabetic() || c == &' ')
+        // .map(|c| c.to_ascii_lowercase())
         .collect::<String>()
         .split_whitespace().collect::<Vec<&str>>().join(" ")
 }
@@ -83,6 +84,8 @@ mod tests {
         assert_eq!(clean_input("  some   spaces   "), "some spaces");
         assert_eq!(clean_input("Oké Måns"), "oke mans");
         assert_eq!(clean_input("Æneid"), "aeneid");
+        assert_eq!(clean_input("test\nword"), "test word");
+        assert_eq!(clean_input("something.\n\nnow other."), "something now other");
     }
 
     #[test]

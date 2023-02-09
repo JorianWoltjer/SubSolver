@@ -3,7 +3,7 @@ use std::{error::Error, fs::read_to_string, thread, sync::mpsc, collections::Has
 use clap::Parser;
 use anyhow::Result;
 
-use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, loading::Loading};
+use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, loading::Loading, cache::{load_cached_dictionary, save_cached_dictionary}};
 
 fn main() {
     let args = Args::parse();
@@ -34,18 +34,38 @@ fn do_main(loading: &Loading, args: Args) -> Result<(), Box<dyn Error>> {
 
     let wordlist_content = match args.wordlist {
         Some(path) => {
-            loading.info(format!("Loaded wordlist from {:?}", path));
+            loading.info(format!("Using wordlist from {:?}", path));
             read_to_string(path)?
         },
         None => {
-            loading.info(format!("Loaded built-in english wordlist"));
+            loading.info(format!("Using built-in english wordlist"));
             include_str!("../wordlist/english.txt").to_string()
         }
     };
-    // TODO: cache this to a file and load with md5 hash + add --no-cache flag
-    loading.text("Finding patterns in wordlist...".to_string());
-    let dictionary = load_wordlist(wordlist_content);
-    loading.success(format!("Loaded {} unique patterns", dictionary.len()));
+
+    // Try loading from cache
+    let dictionary = if args.no_cache {
+        loading.warn(format!("Dictionary cache disabled"));
+        None
+    } else {
+        loading.text(format!("Loading dictionary cache..."));
+        load_cached_dictionary(&wordlist_content)
+    };
+
+    let dictionary = if dictionary.is_some() {  // Cache loaded
+        loading.success(format!("Loaded {} unique patterns (from cache)", dictionary.as_ref().unwrap().len()));
+        dictionary.unwrap()
+    } else {  // Cache not loaded
+        loading.text("Finding patterns in wordlist...".to_string());
+        let dictionary = load_wordlist(&wordlist_content);
+        loading.success(format!("Loaded {} unique patterns", dictionary.len()));
+        
+        if !args.no_cache {  // Save cache
+            save_cached_dictionary(&wordlist_content, &dictionary)?;
+            loading.success(format!("Saved dictionary cache"));
+        }
+        dictionary
+    };
 
     loading.text(format!("Parsing and mapping input words..."));
 

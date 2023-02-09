@@ -174,7 +174,7 @@ mod tests {
         let ciphertext = "x cbt tloap";
         let wordlist = ["many", "words", "here", "to", "test", "the", "solver", "also", "few", "a", "ok", "now", "all", "words", "should", "be", "good"]
                                     .join("\n");
-        let dictionary = load_wordlist(wordlist);
+        let dictionary = load_wordlist(&wordlist);
 
         let cipher_words = input_to_words(ciphertext, dictionary).unwrap();
         let mut solver = Solver::new(cipher_words);
