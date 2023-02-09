@@ -1,14 +1,15 @@
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 
-use std::{collections::{HashMap, HashSet}};
+use std::collections::{HashMap, HashSet};
 
 use input::clean_input;
 
-pub mod input;
-pub mod solve;
-pub mod cli;
-pub mod loading;
 pub mod cache;
+pub mod cli;
+pub mod input;
+pub mod loading;
+pub mod solve;
 
 #[derive(Debug, Clone)]
 pub struct Word {
@@ -22,8 +23,7 @@ impl Word {
 
         for word in candidates {
             for (i, j) in s.chars().zip(word.chars()) {
-                letter_map.entry(i)
-                    .or_insert(HashSet::new()).insert(j);
+                letter_map.entry(i).or_insert(HashSet::new()).insert(j);
             }
         }
 
@@ -37,10 +37,10 @@ impl Word {
 
 /// Convert word to uppercase, and substitute all characters to be in alphabetical order.
 /// This makes words equivalent if they have the same charactaristics
-/// 
+///
 /// ```rust
 /// use sub_solver::normalize;
-/// 
+///
 /// assert_eq!(normalize("example"), "ABCDEFA");  // "example" has 2 'a's at the start and end
 /// assert_eq!(normalize("example"), normalize("squares"));  // "example" and "squares" have the same repeated character positions
 /// assert_eq!(normalize("testing"), "ABCADEF");  // "testing" does not have repeated characters at the start and end
@@ -55,10 +55,19 @@ pub fn normalize(s: &str) -> String {
         }
 
         // Replace all instances of the character with the replacement
-        result = result.iter().map(|&c| if c == result[i] { replacement as char } else { c }).collect();
+        result = result
+            .iter()
+            .map(|&c| {
+                if c == result[i] {
+                    replacement as char
+                } else {
+                    c
+                }
+            })
+            .collect();
         replacement += 1;
     }
-    
+
     result.into_iter().collect()
 }
 
@@ -69,7 +78,8 @@ pub fn load_wordlist(contents: &str) -> HashMap<String, HashSet<String>> {
     for word in contents.lines() {
         let word = clean_input(word);
         map.entry(normalize(&word))
-                .or_insert(HashSet::new()).insert(word.to_string());
+            .or_insert(HashSet::new())
+            .insert(word.to_string());
     }
 
     map

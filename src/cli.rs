@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{Parser, ArgGroup};
+use clap::{ArgGroup, Parser};
 
 /// Substitution Cipher Solver
 #[derive(Parser, Debug)]
@@ -18,7 +18,7 @@ pub struct Args {
     pub key: Option<String>,
 
     /// Fill in unknowns in solution with random unused letters (default: false)
-    #[arg(short='F', long)]
+    #[arg(short = 'F', long)]
     pub fill_key: bool,
 
     /// Disable dictionary cache (default: false)

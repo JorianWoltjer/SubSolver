@@ -1,5 +1,9 @@
-
-use std::{fs::File, io::{BufReader, BufWriter}, collections::{HashMap, HashSet}, error::Error};
+use std::{
+    collections::{HashMap, HashSet},
+    error::Error,
+    fs::File,
+    io::{BufReader, BufWriter},
+};
 
 lazy_static! {
     static ref CACHE_DIR: String = {
@@ -22,8 +26,11 @@ pub fn load_cached_dictionary(content: &str) -> Option<HashMap<String, HashSet<S
     }
 }
 
-pub fn save_cached_dictionary(content: &str, dictionary: &HashMap<String, HashSet<String>>) -> Result<(), Box<dyn Error>> {
-    std::fs::create_dir_all(&*CACHE_DIR)?;  // Create folder if doesn't exist
+pub fn save_cached_dictionary(
+    content: &str,
+    dictionary: &HashMap<String, HashSet<String>>,
+) -> Result<(), Box<dyn Error>> {
+    std::fs::create_dir_all(&*CACHE_DIR)?; // Create folder if doesn't exist
     let mut file = BufWriter::new(File::create(get_filename(content))?);
     bincode::serialize_into(&mut file, dictionary)?;
     Ok(())

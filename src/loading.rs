@@ -1,7 +1,6 @@
 /// Source: https://github.com/wyhaya/loading/blob/main/src/lib.rs
 /// Formatting altered slightly
-
-use std::io::{Write, stderr};
+use std::io::{stderr, Write};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
@@ -75,7 +74,7 @@ impl Loading {
 
         let _ = self
             .sender
-            .send(Signal::Next(Status::Debug, text.to_string()));
+            .send(Signal::Next(Status::Debug, text));
     }
 
     fn update_animation(sender: Sender<Signal>, mut spinner: Spinner) {
@@ -109,10 +108,14 @@ impl Loading {
                 match signal {
                     Signal::Frame(s) => {
                         frame = s;
-                        if show_loader { write_content!("[{}] {}", frame, text); }
+                        if show_loader {
+                            write_content!("[{}] {}", frame, text);
+                        }
                     }
                     Signal::Text(s) => {
-                        if show_loader { write_content!("[{}] {}", frame, s); }
+                        if show_loader {
+                            write_content!("[{}] {}", frame, s);
+                        }
                         text = s;
                     }
                     Signal::Next(status, s) => {
