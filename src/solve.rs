@@ -83,7 +83,8 @@ fn update_map(cipher: &str, plain: &str, map: &HashMap<char, char>) -> HashMap<c
     let mut map = map.to_owned();
 
     for (i, c) in cipher.chars().enumerate() {
-        map.entry(c).or_insert_with(|| plain.chars().nth(i).unwrap());
+        map.entry(c)
+            .or_insert_with(|| plain.chars().nth(i).unwrap());
     }
 
     map

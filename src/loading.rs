@@ -72,9 +72,7 @@ impl Loading {
     pub fn debug<T: ToString>(&self, text: T) {
         let text = format!("\x1B[90m{}\x1B[0m", text.to_string());
 
-        let _ = self
-            .sender
-            .send(Signal::Next(Status::Debug, text));
+        let _ = self.sender.send(Signal::Next(Status::Debug, text));
     }
 
     fn update_animation(sender: Sender<Signal>, mut spinner: Spinner) {

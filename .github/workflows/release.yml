@@ -2,6 +2,8 @@ on:
   release:
     types: [created]
 
+name: Release Builds
+
 jobs:
   release:
     name: release ${{ matrix.target }}
