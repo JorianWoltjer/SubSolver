@@ -1,7 +1,6 @@
 use std::{error::Error, fs::read_to_string, thread, sync::mpsc, collections::HashMap};
 
 use clap::Parser;
-use anyhow::Result;
 
 use sub_solver::{solve::{prune, Solver}, input::{input_to_words, clean_input, parse_key}, cli::Args, load_wordlist, loading::Loading, cache::{load_cached_dictionary, save_cached_dictionary}};
 

@@ -2,9 +2,16 @@
 name = "sub-solver"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jorian Woltjer (J0R1AN)"]
+license = "MIT OR Apache-2.0"
+description = "Solve Substitution Ciphers using a wordlist"
+readme = "README.md"
+homepage = "https://github.com/JorianWoltjer/SubSolver"
+repository = "https://github.com/JorianWoltjer/SubSolver"
+keywords = ["cli", "cryptography", "cipher", "solver", "substitution", "wordlist"]
+categories = ["command-line-utilities"]
 
 [dependencies]
-anyhow = "1.0.69"
 bincode = "1.3.3"
 clap = { version = "4.1.4", features = ["derive"] }
 dirs = "4.0.0"
