@@ -94,11 +94,11 @@ pub struct Solver {
     pub cipher_words: Vec<Word>,
 }
 impl Solver {
-    pub fn new(cipher_words: Vec<Word>) -> Self {
-        Solver { cipher_words }
+    pub fn new(cipher_words: &Vec<Word>) -> Self {
+        Solver { cipher_words: cipher_words.to_owned() }
     }
 
-    pub fn solve(&mut self, tx: &mpsc::Sender<Solution>, mut starting_key: HashMap<char, char>) {
+    pub fn solve(&mut self, mut starting_key: HashMap<char, char>, tx: Option<&mpsc::Sender<Solution>>) {
         self.solve_recursive(0, &mut starting_key, tx);
     }
 
@@ -106,13 +106,15 @@ impl Solver {
         &mut self,
         depth: usize,
         map: &mut HashMap<char, char>,
-        tx: &mpsc::Sender<Solution>,
+        tx: Option<&mpsc::Sender<Solution>>,
     ) {
         if is_consistent(map) {
             if depth >= self.cipher_words.len() {
                 // Solution found
                 let solution = Solution::new(map.to_owned());
-                tx.send(solution).unwrap();
+                if let Some(tx) = tx {
+                    tx.send(solution).unwrap();
+                }
             } else {
                 // Explore all candidates
                 for i in self.cipher_words[depth].candidates.to_owned().iter() {
@@ -193,11 +195,11 @@ mod tests {
         .join("\n");
         let dictionary = load_wordlist(&wordlist);
 
-        let cipher_words = input_to_words(ciphertext, dictionary).unwrap();
-        let mut solver = Solver::new(cipher_words);
+        let cipher_words = input_to_words(ciphertext, &dictionary).unwrap();
+        let mut solver = Solver::new(&cipher_words);
 
         let (tx, rx) = mpsc::channel();
-        solver.solve(&tx, HashMap::new());
+        solver.solve(HashMap::new(), Some(&tx));
 
         let solution = rx.recv().unwrap();
         let plaintext = solution.apply(ciphertext);

@@ -34,7 +34,7 @@ pub fn clean_input(input: &str) -> String {
 /// Returns `None` if the input string contains a word that is not possible in the dictionary
 pub fn input_to_words(
     input: &str,
-    dictionary: HashMap<String, HashSet<String>>,
+    dictionary: &HashMap<String, HashSet<String>>,
 ) -> Result<Vec<Word>, String> {
     let mut result = Vec::new();
 

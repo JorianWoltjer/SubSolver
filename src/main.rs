@@ -96,7 +96,7 @@ fn do_main(loading: &Loading, args: Args) -> Result<(), Box<dyn Error>> {
     // Parse input
     let ciphertext_clean = clean_input(&ciphertext);
 
-    let mut cipher_words = input_to_words(&ciphertext_clean, dictionary)?;
+    let mut cipher_words = input_to_words(&ciphertext_clean, &dictionary)?;
 
     loading.success(format!("Parsed {} input words", cipher_words.len()));
 
@@ -113,8 +113,8 @@ fn do_main(loading: &Loading, args: Args) -> Result<(), Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
-        let mut solver = Solver::new(cipher_words);
-        solver.solve(&tx, starting_key);
+        let mut solver = Solver::new(&cipher_words);
+        solver.solve(starting_key, Some(&tx));
     });
 
     let mut solutions = 0;
