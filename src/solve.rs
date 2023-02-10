@@ -95,10 +95,16 @@ pub struct Solver {
 }
 impl Solver {
     pub fn new(cipher_words: &Vec<Word>) -> Self {
-        Solver { cipher_words: cipher_words.to_owned() }
+        Solver {
+            cipher_words: cipher_words.to_owned(),
+        }
     }
 
-    pub fn solve(&mut self, mut starting_key: HashMap<char, char>, tx: Option<&mpsc::Sender<Solution>>) {
+    pub fn solve(
+        &mut self,
+        mut starting_key: HashMap<char, char>,
+        tx: Option<&mpsc::Sender<Solution>>,
+    ) {
         self.solve_recursive(0, &mut starting_key, tx);
     }
 
