@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     sync::mpsc,
 };
+use base64::{Engine, prelude::BASE64_STANDARD};
 
 use crate::Word;
 
@@ -24,7 +25,7 @@ pub fn prune(cipher_words: &mut [Word]) {
     let mut pruner: HashMap<char, HashSet<char>> = HashMap::new();
     for i in 'a'..='z' {
         for j in 'a'..='z' {
-            pruner.entry(i).or_insert(HashSet::new()).insert(j);
+            pruner.entry(i).or_default().insert(j);
         }
     }
 
@@ -174,6 +175,12 @@ impl Solution {
         }
 
         result
+    }
+
+    pub fn format_hyperlink(&self, ciphertext: &str) -> String {
+        let ciphertext = BASE64_STANDARD.encode(ciphertext);
+        let url = format!("https://gchq.github.io/CyberChef/#recipe=Substitute('ABCDEFGHIJKLMNOPQRSTUVWXYZ','{self}',true)&input={ciphertext}");
+        format!("\x1b]8;;{url}\x1b\\{self}\x1b]8;;\x1b\\")
     }
 }
 impl Display for Solution {

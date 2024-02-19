@@ -1,4 +1,6 @@
-use std::{collections::HashMap, error::Error, fs::read_to_string, sync::mpsc, thread};
+use std::{
+    collections::HashMap, error::Error, fs::read_to_string, io::IsTerminal, sync::mpsc, thread,
+};
 
 use clap::Parser;
 
@@ -126,7 +128,12 @@ fn do_main(loading: &Loading, args: Args) -> Result<(), Box<dyn Error>> {
             solution.fill_key();
         }
 
-        println!("{solution} -> {plaintext}");
+        let formatted_solution = if std::io::stdout().is_terminal() {
+            solution.format_hyperlink(&ciphertext)
+        } else {
+            solution.to_string()
+        };
+        println!("{formatted_solution} -> {plaintext}");
         solutions += 1;
     }
 
