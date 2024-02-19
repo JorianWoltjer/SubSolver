@@ -1,9 +1,9 @@
+use base64::{prelude::BASE64_STANDARD, Engine};
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,
     sync::mpsc,
 };
-use base64::{Engine, prelude::BASE64_STANDARD};
 
 use crate::Word;
 
